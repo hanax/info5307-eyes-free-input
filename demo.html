@@ -25,7 +25,11 @@
     height: 100%;
     background: #ccc;
   }
-  #log {
+  #log_cur {
+    font-size: 25px;
+    color: #ff0000;
+  }
+  #log_text {
     font-size: 50px;
   }
   #f-log {
@@ -37,31 +41,138 @@
 
 <script type="text/javascript">
 
-  $(document).ready( function() {
+  var MAP = [
+    ['delete', ' ', ' ', ' '],
+    ['a', 'b', 'c', 'c'],
+    ['d', 'e', 'f', 'f'],
+    ['g', 'h', 'i', 'i'],
+    ['j', 'k', 'l', 'l'],
+    ['m', 'n', 'o', 'o'],
+    ['p', 'q', 'r', 's'],
+    ['t', 'u', 'v', 'v'],
+    ['w', 'x', 'y', 'z']
+  ]
 
+  var readLetter = function(l) {
+    window.speechSynthesis.cancel();
+    var msg = new SpeechSynthesisUtterance();
+    msg.voiceURI = 'Google UK English Male';
+    msg.volume = 1; // 0 to 1
+    msg.rate = 1; // 0.1 to 10
+    msg.pitch = 1; //0 to 2
+    msg.text = l === ' ' ? 'space' : l;
+    msg.lang = 'en-US';
+    
+    window.speechSynthesis.speak(msg);
+  }
+
+  $(document).ready( function() {
+    var fingerNo = -1;
+    var screenX = $(window).width();
+    var screenY = $(window).height();
+    var liftX = screenX;
+    var liftY = -1;
+    var lastSection = -1;
 
     $("body").bind(
-      "touchmove mousemove",
+      "touchmove",
       function(e) {
-        // $("#log").html(e.touches.length);
-        e.preventDefault();
+        var curX = screenX;
+        var curY = -1;
+        for (var i = 0; i < e.originalEvent.targetTouches.length; i ++) {
+          if (e.originalEvent.targetTouches[i].clientX < curX) {
+            curX = e.originalEvent.targetTouches[i].clientX;
+            curY = e.originalEvent.targetTouches[i].clientY;
+          }
+        }
+        var curSection = getSection(curX, curY);
+        if (curSection != lastSection) {
+          var curKey = MAP[curSection][fingerNo];
+          $("#log_cur").text(curKey);
+          readLetter(curKey);
+          lastSection = curSection;
+        }
 
         var posX = e.originalEvent.touches ? 
             e.originalEvent.touches[0].pageX : e.pageX;
         var posY = e.originalEvent.touches ? 
             e.originalEvent.touches[0].pageY : e.pageY;
-        $("#log").html(e.touches.length + ', ' + posX + ', ' + posY);
+
+        e.preventDefault();
       }
     );
 
-    $("body").doubletap(
-      function(e){
-        $(".audioDoubleTap").trigger('play');
-        // TODO: backspace
-      }, null, 200
+    $("body").bind(
+      "touchstart",
+      function(e) {
+        liftX = screenX;
+        liftY = -1;
+
+        fingerNo = e.originalEvent.targetTouches.length - 1;
+
+        e.preventDefault();
+      }
     );
 
+    $("body").bind(
+      "touchend",
+      function(e) {
+        var touchobj = e.originalEvent.changedTouches[0];
+        if (touchobj.clientX < liftX) {
+          liftX = touchobj.clientX;
+          liftY = touchobj.clientY;
+        }
+
+        if (e.originalEvent.targetTouches.length === 0) {
+          var curSection = getSection(liftX, liftY);
+
+          if (curSection === 0 && fingerNo === 0) {
+            // $(".audioClick").trigger('play');
+            readLetter('delete');
+            var len = $("#log_text").text().length;
+            $("#log_text").text($("#log_text").text().slice(0, len-1));
+            return;
+          }
+
+          var inputKey = MAP[curSection][fingerNo];
+
+          $("#log_text").append(inputKey);
+          readLetter(inputKey);
+        }
+
+        e.preventDefault();
+      }
+    );
+
+    var getSection = function(x, y) {
+      if (y <= screenY / 3) {
+        if (x <= screenX / 3) {
+          return 0;
+        } else if (x <= screenX * 2 / 3) {
+          return 1;
+        } else {
+          return 2;
+        }
+      } else if (y <= screenY * 2 / 3) {
+        if (x <= screenX / 3) {
+          return 3;
+        } else if (x <= screenX * 2 / 3) {
+          return 4;
+        } else {
+          return 5;
+        }
+      } else {
+        if (x <= screenX / 3) {
+          return 6;
+        } else if (x <= screenX * 2 / 3) {
+          return 7;
+        } else {
+          return 8;
+        }
+      }
+    }
   });
+
 </script>
 
 </head>
@@ -70,7 +181,8 @@
 
 <div class="control-area">
 
-  <div id="log"> log here </div>
+  <div id="log_cur"></div>
+  <div id="log_text"></div>
 
 </div>
 
