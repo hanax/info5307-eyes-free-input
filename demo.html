@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Eyes-free input demo</title>
+
+<meta name="renderer" content="webkit" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.doubletap.js"></script>
+
+<style>
+  body {
+    overflow: hidden;
+    word-wrap: break-word;
+  }
+  .control-area {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: #ccc;
+  }
+  #log {
+    display: none;
+    font-size: 50px;
+  }
+  #f-log {
+    display: none;
+    font-size: 40px;
+    color: #00cc00;
+  }
+</style>
+
+<script type="text/javascript">
+
+  $(document).ready( function() {
+
+
+    $("body").bind(
+      "touchmove",
+      function(e) {
+        $("#log").html(e.touches.length);
+        e.preventDefault();
+
+        var posX = e.originalEvent.touches ? 
+            e.originalEvent.touches[0].pageX : e.pageX;
+        var posY = e.originalEvent.touches ? 
+            e.originalEvent.touches[0].pageY : e.pageY;
+      }
+    );
+
+    $("body").doubletap(
+      function(e){
+        $(".audioDoubleTap").trigger('play');
+        // TODO: backspace
+      }, null, 200
+    );
+
+  });
+</script>
+
+</head>
+
+<body>
+
+<div class="control-area">
+
+  <div id="log"> log here </div>
+
+</div>
+
+<audio class="audioClick" src="click.mp3" ></audio>
+<audio class="audioDoubleTap" src="double.mp3" ></audio>
+</body>
+</html>
