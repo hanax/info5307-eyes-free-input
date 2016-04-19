@@ -113,13 +113,12 @@
     $("body").bind(
       "touchend",
       function(e) {
-        if (!hasMoved) {
-          var coord = getCurCoord(e.originalEvent.touches);
-          var curSection = getSection(coord.x, coord.y);
-          curKey = MAP[curSection][fingerNo];
-        }
 
         if (inSession && e.originalEvent.touches.length === 0) {
+          if (!hasMoved) {
+            var coord = getCurCoord(e.originalEvent.changedTouches);
+            curKey = MAP[getSection(coord.x, coord.y)][fingerNo];
+          }
           inSession = false;
           hasMoved = false;
 
