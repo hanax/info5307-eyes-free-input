@@ -112,7 +112,6 @@
       function(e) {
         inSession = true;
         fingerNo = e.originalEvent.touches.length - 1;
-        curKey = MAP[getSection(e.originalEvent.touches[i].clientX, e.originalEvent.touches[i].clientY)][fingerNo];
 
         e.preventDefault();
       }

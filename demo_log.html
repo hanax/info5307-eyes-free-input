@@ -48,24 +48,12 @@
 
     $(window).bind('keydown', function(e) {
       if (e.keyCode == 13 /* enter */) {
-        if (!isStarted) {
-          isStarted = true;
-        } else {
-          newTask.transcribed = $("#log").text();
-          myLog.task.push(newTask);
-        }
-        var idx = Math.floor(Math.random() * ph.length);
-        $("#phrase").text(ph[idx]);
-
-        $("#log").text('');
-        newTask = new Object();
-        newTask.number = taskIdx;
-        taskIdx ++;
-        newTask.testing = "False";
-        newTask.presented = ph[idx];
-        newTask.entry = [];
+        recordAndStart();
       }
       if (e.keyCode == 69 /* e */) {
+        if ($("#log").text().length != 0) {
+          recordAndStart();
+        }
         myLog.close.error = 0;
         myLog.close.time = new Date().getTime()/1000;
         myLog.close.date = new Date().toJSON().slice(0,10);
@@ -90,6 +78,25 @@
         newTask.entry.push(newEntry);
       }
     });
+
+    var recordAndStart = function() {
+      if (!isStarted) {
+        isStarted = true;
+      } else {
+        newTask.transcribed = $("#log").text();
+        myLog.task.push(newTask);
+      }
+      var idx = Math.floor(Math.random() * ph.length);
+      $("#phrase").text(ph[idx]);
+
+      $("#log").text('');
+      newTask = new Object();
+      newTask.number = taskIdx;
+      taskIdx ++;
+      newTask.testing = "False";
+      newTask.presented = ph[idx];
+      newTask.entry = [];
+    }
   });
 
 </script>
