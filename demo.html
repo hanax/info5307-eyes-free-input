@@ -75,6 +75,7 @@
     var lastSection = -1;
     var curKey = '';
     var inSession = false;
+    var hasMoved = false;
 
     $(window).on("orientationchange", function(event) {
       screenX = $(window).width();
@@ -84,18 +85,9 @@
     $("body").bind(
       "touchmove",
       function(e) {
-        var curX = 0;
-        var curY = 0;
-        for (var i = 0; i < e.originalEvent.touches.length; i ++) {
-          curX += e.originalEvent.touches[i].clientX;
-          curY += e.originalEvent.touches[i].clientY;
-        }
-        if (e.originalEvent.touches.length != 0) {
-          curX /= e.originalEvent.touches.length;
-          curY /= e.originalEvent.touches.length;
-        }
+        var coord = getCurCoord(e.originalEvent.touches);
 
-        var curSection = getSection(curX, curY);
+        var curSection = getSection(coord.x, coord.y);
         if (curSection != lastSection) {
           curKey = MAP[curSection][fingerNo];
           $("#log_cur").text(curKey);
@@ -103,6 +95,7 @@
           lastSection = curSection;
         }
 
+        hasMoved = true;
         e.preventDefault();
       }
     );
@@ -120,8 +113,15 @@
     $("body").bind(
       "touchend",
       function(e) {
+        if (!hasMoved) {
+          var coord = getCurCoord(e.originalEvent.touches);
+          var curSection = getSection(coord.x, coord.y);
+          curKey = MAP[curSection][fingerNo];
+        }
+
         if (inSession && e.originalEvent.touches.length === 0) {
           inSession = false;
+          hasMoved = false;
 
           if (curKey === 'delete') {
             var len = $("#log_text").text().length;
@@ -137,6 +137,21 @@
         e.preventDefault();
       }
     );
+
+    var getCurCoord = function(touches) {
+      var coord = new Object();
+      coord.x = 0;
+      coord.y = 0;
+      for (var i = 0; i < touches.length; i ++) {
+        coord.x += touches[i].clientX;
+        coord.y += touches[i].clientY;
+      }
+      if (touches.length != 0) {
+        coord.x /= touches.length;
+        coord.y /= touches.length;
+      }
+      return coord;
+    }
 
     var getSection = function(x, y) {
       if (y <= screenY / 3) {
