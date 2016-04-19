@@ -75,6 +75,7 @@
     var liftX = screenX;
     var liftY = -1;
     var lastSection = -1;
+    var curKey = -1;
 
     $(window).on("orientationchange", function(event) {
       screenX = $(window).width();
@@ -94,7 +95,7 @@
         }
         var curSection = getSection(curX, curY);
         if (curSection != lastSection) {
-          var curKey = MAP[curSection][fingerNo];
+          curKey = MAP[curSection][fingerNo];
           $("#log_cur").text(curKey);
           readLetter(curKey);
           lastSection = curSection;
@@ -124,29 +125,17 @@
     $("body").bind(
       "touchend",
       function(e) {
-        var touchobj = e.originalEvent.changedTouches[0];
-        if (touchobj.clientX < liftX) {
-          liftX = touchobj.clientX;
-          liftY = touchobj.clientY;
-        }
 
         if (e.originalEvent.touches.length === 0) {
-          var curSection = getSection(liftX, liftY);
-
-          if (curSection === 0 && fingerNo === 0) {
-            // $(".audioClick").trigger('play');
-            readLetter('delete');
+          if (curKey === 'delete') {
             var len = $("#log_text").text().length;
             $("#log_text").text($("#log_text").text().slice(0, len-1));
             dataRef.update({letter: '.', len: $("#log_text").text().length});
-            return;
+          } else {
+            $("#log_text").append(inputKey);
+            // readLetter(inputKey);
+            dataRef.update({letter: inputKey, len: $("#log_text").text().length});
           }
-
-          var inputKey = MAP[curSection][fingerNo];
-
-          $("#log_text").append(inputKey);
-          readLetter(inputKey);
-          dataRef.update({letter: inputKey, len: $("#log_text").text().length});
         }
 
         e.preventDefault();
