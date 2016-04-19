@@ -132,10 +132,10 @@
             $("#log_text").text($("#log_text").text().slice(0, len-1));
             dataRef.update({letter: '.', len: $("#log_text").text().length});
           } else {
-            $("#log_text").append(inputKey);
-            // readLetter(inputKey);
-            dataRef.update({letter: inputKey, len: $("#log_text").text().length});
+            $("#log_text").append(curKey);
+            dataRef.update({letter: curKey, len: $("#log_text").text().length});
           }
+          readLetter(curKey);
         }
 
         e.preventDefault();
