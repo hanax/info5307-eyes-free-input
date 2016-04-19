@@ -76,7 +76,13 @@
     dataRef.on('value', function(snapshot) {
       if (isStarted) {
         var curLetter = snapshot.val().letter;
-        $("#log").append(curLetter);
+        if (curLetter === '.') {
+          var len = $("#log").text().length;
+          $("#log").text($("#log").text().slice(0, len-1));
+        } else {
+          $("#log").append(curLetter);
+        }
+
         var newEntry = new Object();
         newEntry.char = curLetter === '.' ? '&#008;' : curLetter; // backspace
         newEntry.value = curLetter === '.' ? 8 : curLetter.charCodeAt(0); // backspace

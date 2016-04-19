@@ -136,9 +136,9 @@
           if (curSection === 0 && fingerNo === 0) {
             // $(".audioClick").trigger('play');
             readLetter('delete');
-            dataRef.update({letter: '.'});
             var len = $("#log_text").text().length;
             $("#log_text").text($("#log_text").text().slice(0, len-1));
+            dataRef.update({letter: '.', len: $("#log_text").text().length});
             return;
           }
 
@@ -146,7 +146,7 @@
 
           $("#log_text").append(inputKey);
           readLetter(inputKey);
-          dataRef.update({letter: inputKey});
+          dataRef.update({letter: inputKey, len: $("#log_text").text().length});
         }
 
         e.preventDefault();
