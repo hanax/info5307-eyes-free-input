@@ -72,10 +72,9 @@
     var fingerNo = -1;
     var screenX = $(window).width();
     var screenY = $(window).height();
-    var liftX = screenX;
-    var liftY = -1;
     var lastSection = -1;
-    var curKey = -1;
+    var curKey = '';
+    var inSession = false;
 
     $(window).on("orientationchange", function(event) {
       screenX = $(window).width();
@@ -85,14 +84,17 @@
     $("body").bind(
       "touchmove",
       function(e) {
-        var curX = screenX;
-        var curY = -1;
-        for (var i = 0; i < e.originalEvent.targetTouches.length; i ++) {
-          if (e.originalEvent.targetTouches[i].clientX < curX) {
-            curX = e.originalEvent.targetTouches[i].clientX;
-            curY = e.originalEvent.targetTouches[i].clientY;
-          }
+        var curX = 0;
+        var curY = 0;
+        for (var i = 0; i < e.originalEvent.touches.length; i ++) {
+          curX += e.originalEvent.touches[i].clientX;
+          curY += e.originalEvent.touches[i].clientY;
         }
+        if (e.originalEvent.touches.length != 0) {
+          curX /= e.originalEvent.touches.length;
+          curY /= e.originalEvent.touches.length;
+        }
+
         var curSection = getSection(curX, curY);
         if (curSection != lastSection) {
           curKey = MAP[curSection][fingerNo];
@@ -101,11 +103,6 @@
           lastSection = curSection;
         }
 
-        var posX = e.originalEvent.touches ? 
-            e.originalEvent.touches[0].pageX : e.pageX;
-        var posY = e.originalEvent.touches ? 
-            e.originalEvent.touches[0].pageY : e.pageY;
-
         e.preventDefault();
       }
     );
@@ -113,10 +110,9 @@
     $("body").bind(
       "touchstart",
       function(e) {
-        liftX = screenX;
-        liftY = -1;
-
+        inSession = true;
         fingerNo = e.originalEvent.touches.length - 1;
+        curKey = MAP[getSection(e.originalEvent.touches[i].clientX, e.originalEvent.touches[i].clientY)][fingerNo];
 
         e.preventDefault();
       }
@@ -125,8 +121,9 @@
     $("body").bind(
       "touchend",
       function(e) {
+        if (inSession && e.originalEvent.touches.length === 0) {
+          inSession = false;
 
-        if (e.originalEvent.touches.length === 0) {
           if (curKey === 'delete') {
             var len = $("#log_text").text().length;
             $("#log_text").text($("#log_text").text().slice(0, len-1));
