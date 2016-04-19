@@ -115,7 +115,7 @@
         liftX = screenX;
         liftY = -1;
 
-        fingerNo = e.originalEvent.targetTouches.length - 1;
+        fingerNo = e.originalEvent.touches.length - 1;
 
         e.preventDefault();
       }
@@ -130,7 +130,7 @@
           liftY = touchobj.clientY;
         }
 
-        if (e.originalEvent.targetTouches.length === 0) {
+        if (e.originalEvent.touches.length === 0) {
           var curSection = getSection(liftX, liftY);
 
           if (curSection === 0 && fingerNo === 0) {
