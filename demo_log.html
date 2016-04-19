@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Eyes-free input demo</title>
+
+<meta name="renderer" content="webkit" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+
+<style>
+  body {
+    overflow: hidden;
+    word-wrap: break-word;
+  }
+  #log {
+    font-size: 20px;
+  }
+</style>
+
+<script type="text/javascript">
+  var dataRef = new Firebase('https://info5307-eyes-free.firebaseio.com/');
+  window.dataRef = dataRef;
+
+  $(document).ready( function() {
+    var ph;
+    var myLog = new Object();
+    myLog.version = "2.0.2";
+    myLog.time = new Date().getTime()/1000;
+    myLog.date = new Date().toJSON().slice(0,10);
+    myLog.task = [];
+    myLog.close = new Object();
+    var taskIdx = 1;
+    var newTask;
+    var isStarted = false;
+
+    $.getJSON("phrases.json")
+      .done(function( json ) {
+        ph = json.phrases;
+      })
+      .fail(function(jqxhr, textStatus, error) {
+        var err = textStatus + ", " + error;
+        console.log( err );
+    });
+
+    $(window).bind('keydown', function(e) {
+      if (e.keyCode == 13 /* enter */) {
+        if (!isStarted) {
+          isStarted = true;
+        } else {
+          newTask.transcribed = $("#log").text();
+          myLog.task.push(newTask);
+        }
+        var idx = Math.floor(Math.random() * ph.length);
+        $("#phrase").text(ph[idx]);
+
+        $("#log").text('');
+        newTask = new Object();
+        newTask.number = taskIdx;
+        taskIdx ++;
+        newTask.testing = "False";
+        newTask.presented = ph[idx];
+        newTask.entry = [];
+      }
+      if (e.keyCode == 69 /* e */) {
+        myLog.close.error = 0;
+        myLog.close.time = new Date().getTime()/1000;
+        myLog.close.date = new Date().toJSON().slice(0,10);
+        console.log(myLog);
+      }
+    });
+
+    dataRef.on('value', function(snapshot) {
+      if (isStarted) {
+        var curLetter = snapshot.val().letter;
+        $("#log").append(curLetter);
+        var newEntry = new Object();
+        newEntry.char = curLetter === '.' ? '&#008;' : curLetter; // backspace
+        newEntry.value = curLetter === '.' ? 8 : curLetter.charCodeAt(0); // backspace
+        newEntry.time = new Date().getTime()/1000;
+        newTask.entry.push(newEntry);
+      }
+    });
+  });
+
+</script>
+
+</head>
+
+<body>
+<div id="instruction">Press enter to save the current input and start inputting next phrase. Press 'e' to end a session. </div>
+<div id="phrase"></div>
+<div id="log"></div>
+
+</body>
+</html>

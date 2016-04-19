@@ -10,7 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
 <script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/jquery.doubletap.js"></script>
+<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
 
 <style>
   body {
@@ -40,6 +40,8 @@
 </style>
 
 <script type="text/javascript">
+  var dataRef = new Firebase('https://info5307-eyes-free.firebaseio.com/');
+  window.dataRef = dataRef;
 
   var MAP = [
     ['delete', ' ', ' ', ' '],
@@ -73,6 +75,11 @@
     var liftX = screenX;
     var liftY = -1;
     var lastSection = -1;
+
+    $(window).on("orientationchange", function(event) {
+      var screenX = $(window).width();
+      var screenY = $(window).height();
+    });
 
     $("body").bind(
       "touchmove",
@@ -129,6 +136,7 @@
           if (curSection === 0 && fingerNo === 0) {
             // $(".audioClick").trigger('play');
             readLetter('delete');
+            dataRef.update({letter: '.'});
             var len = $("#log_text").text().length;
             $("#log_text").text($("#log_text").text().slice(0, len-1));
             return;
@@ -138,6 +146,7 @@
 
           $("#log_text").append(inputKey);
           readLetter(inputKey);
+          dataRef.update({letter: inputKey});
         }
 
         e.preventDefault();
