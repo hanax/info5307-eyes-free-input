@@ -28,9 +28,9 @@
   $(document).ready( function() {
     var ph;
     var myLog = new Object();
-    myLog.version = "2.0.2";
-    myLog.time = new Date().getTime()/1000;
-    myLog.date = new Date().toJSON().slice(0,10);
+    myLog["@version"] = "2.0.2";
+    myLog["@time"] = new Date().getTime()/1000;
+    myLog["@date"] = new Date().toJSON().slice(0,10);
     myLog.task = [];
     myLog.close = new Object();
     var taskIdx = 1;
@@ -48,15 +48,16 @@
 
     $(window).bind('keydown', function(e) {
       if (e.keyCode == 13 /* enter */) {
+        console.log("current time", new Date().getTime()/1000)
         recordAndStart();
       }
       if (e.keyCode == 69 /* e */) {
         if ($("#log").text().length != 0) {
           recordAndStart();
         }
-        myLog.close.error = 0;
-        myLog.close.time = new Date().getTime()/1000;
-        myLog.close.date = new Date().toJSON().slice(0,10);
+        myLog.close['@error'] = 0;
+        myLog.close['@time'] = new Date().getTime()/1000;
+        myLog.close['@date'] = new Date().toJSON().slice(0,10);
         console.log(myLog);
       }
     });
@@ -72,9 +73,9 @@
         }
 
         var newEntry = new Object();
-        newEntry.char = curLetter === '.' ? '&#008;' : curLetter; // backspace
-        newEntry.value = curLetter === '.' ? 8 : curLetter.charCodeAt(0); // backspace
-        newEntry.time = new Date().getTime()/1000;
+        newEntry['@char'] = curLetter === '.' ? '&#008;' : curLetter; // backspace
+        newEntry['@value'] = curLetter === '.' ? 8 : curLetter.charCodeAt(0); // backspace
+        newEntry['@time'] = new Date().getTime()/1000;
         newTask.entry.push(newEntry);
       }
     });
@@ -91,9 +92,9 @@
 
       $("#log").text('');
       newTask = new Object();
-      newTask.number = taskIdx;
+      newTask['@number'] = taskIdx;
       taskIdx ++;
-      newTask.testing = "False";
+      newTask['@testing'] = "False";
       newTask.presented = ph[idx];
       newTask.entry = [];
     }
